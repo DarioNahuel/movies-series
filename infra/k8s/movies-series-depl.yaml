@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: movies-series-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: movies-series
+  template:
+    metadata:
+      labels:
+        app: movies-series
+    spec:
+      containers:
+        - name: movies-series
+          image: darionahuel/movies-series
+          env:
+            - name: MONGO_URI
+              value: 'mongodb://movies-series-mongo-srv:27017/movies-series'
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: jwt-secret
+                  key: JWT_SECRET
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: movies-series-srv
+spec:
+  selector:
+    app: movies-series
+  ports:
+    - name: movies-series
+      protocol: TCP
+      port: 3000
+      targetPort: 3000
